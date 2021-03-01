@@ -11,14 +11,14 @@ enum class DownloadStatus {
 class GetRawData {
     private var downloadStatus = DownloadStatus.IDLE
 
-    fun download(url: String) : String {
+    fun download(url: String) : Pair<DownloadStatus, String> {
         if (url.isEmpty()) {
             downloadStatus = DownloadStatus.NOT_INITIALISED
-            return "No URL specified"
+            return Pair(downloadStatus, "No URL specified")
         }
         try {
             downloadStatus = DownloadStatus.OK
-            return URL(url).readText()
+            return Pair(downloadStatus, URL(url).readText())
         } catch (e: Exception) {
             val errorMessage = when (e) {
                 is MalformedURLException -> {
@@ -39,7 +39,7 @@ class GetRawData {
                 }
             }
             Log.e(TAG, errorMessage)
-            return errorMessage
+            return Pair(downloadStatus, errorMessage)
         }
     }
 

@@ -7,8 +7,14 @@ import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import ru.talkinglessons.flickrbrowser.data.providers.DownloadStatus
+import ru.talkinglessons.flickrbrowser.data.providers.GetRawData
 
 class MainActivity : AppCompatActivity() {
+    private val ioScope = CoroutineScope(Dispatchers.IO)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate called")
@@ -16,10 +22,16 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+//        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
+//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                    .setAction("Action", null).show()
+//        }
+        val getRawData = GetRawData()
+        ioScope.launch {
+           val result = getRawData.download(FLICKR_API)
+            onDownloadComplete(result.first, result.second)
         }
+
         Log.d(TAG, "onCreate ends")
     }
 
@@ -41,7 +53,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun onDownloadComplete(status: DownloadStatus, data: String) {
+        if (status == DownloadStatus.OK) {
+            Log.d(TAG, "onDownloadComplete called, data is $data")
+        } else {
+            Log.d(TAG, "onDownloadComplete failed with status $status. Error message is: $data")
+        }
+    }
+
     companion object {
         private const val TAG = "MainActivity"
+        private const val FLICKR_API =  "https://api.flickr.com/services/feeds/photos_public.gne?tags=android,oreo" +
+                "&format=json&nojsoncallback=1"
     }
 }
