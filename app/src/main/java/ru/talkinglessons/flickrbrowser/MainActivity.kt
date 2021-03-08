@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.talkinglessons.flickrbrowser.data.providers.DownloadStatus
 import ru.talkinglessons.flickrbrowser.data.providers.GetRawData
+import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
     private val ioScope = CoroutineScope(Dispatchers.IO)
@@ -28,8 +29,8 @@ class MainActivity : AppCompatActivity() {
 //        }
         val getRawData = GetRawData()
         ioScope.launch {
-           val result = getRawData.download(FLICKR_API)
-            onDownloadComplete(result.first, result.second)
+            val result = getRawData.download(FLICKR_API)
+//            onDownloadComplete(result.first, result.second)
         }
 
         Log.d(TAG, "onCreate ends")
@@ -63,7 +64,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
-        private const val FLICKR_API =  "https://api.flickr.com/services/feeds/photos_public.gne?tags=android,oreo" +
+        private const val FLICKR_API = "https://api.flickr.com/services/feeds/photos_public.gne?tags=android,oreo" +
                 "&format=json&nojsoncallback=1"
     }
 }
