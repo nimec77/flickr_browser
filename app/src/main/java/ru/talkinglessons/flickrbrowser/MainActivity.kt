@@ -11,11 +11,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.talkinglessons.flickrbrowser.data.providers.DownloadStatus
+import ru.talkinglessons.flickrbrowser.data.providers.GetFlickrJsonData
 import ru.talkinglessons.flickrbrowser.data.providers.GetRawData
+import ru.talkinglessons.flickrbrowser.domain.entities.Photo
 import java.lang.Exception
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), GetFlickrJsonData.OnDataAvailable {
     private val ioScope = CoroutineScope(Dispatchers.IO)
+    private val mainScope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate called")
@@ -30,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         val getRawData = GetRawData()
         ioScope.launch {
             val result = getRawData.download(FLICKR_API)
-//            onDownloadComplete(result.first, result.second)
+            onDownloadComplete(result.first, result.second)
         }
 
         Log.d(TAG, "onCreate ends")
@@ -57,9 +60,22 @@ class MainActivity : AppCompatActivity() {
     private fun onDownloadComplete(status: DownloadStatus, data: String) {
         if (status == DownloadStatus.OK) {
             Log.d(TAG, "onDownloadComplete called, data is $data")
+
+            val getFlickrJsonData = GetFlickrJsonData(this)
+            getFlickrJsonData.toJson(data)
         } else {
             Log.d(TAG, "onDownloadComplete failed with status $status. Error message is: $data")
         }
+    }
+
+    override fun onDataAvailable(data: List<Photo>) {
+        Log.d(TAG, "onDataAvailable called, data is $data")
+
+        Log.d(TAG, "onDataAvailable ends")
+    }
+
+    override fun onError(exception: Exception) {
+        Log.e(TAG, "onError called with ${exception.message}")
     }
 
     companion object {
@@ -67,4 +83,5 @@ class MainActivity : AppCompatActivity() {
         private const val FLICKR_API = "https://api.flickr.com/services/feeds/photos_public.gne?tags=android,oreo" +
                 "&format=json&nojsoncallback=1"
     }
+
 }
