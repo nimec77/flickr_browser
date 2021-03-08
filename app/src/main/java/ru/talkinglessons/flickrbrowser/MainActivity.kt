@@ -1,12 +1,11 @@
 package ru.talkinglessons.flickrbrowser
 
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,7 +13,6 @@ import ru.talkinglessons.flickrbrowser.data.providers.DownloadStatus
 import ru.talkinglessons.flickrbrowser.data.providers.GetFlickrJsonData
 import ru.talkinglessons.flickrbrowser.data.providers.GetRawData
 import ru.talkinglessons.flickrbrowser.domain.entities.Photo
-import java.lang.Exception
 
 class MainActivity : AppCompatActivity(), GetFlickrJsonData.OnDataAvailable {
     private val ioScope = CoroutineScope(Dispatchers.IO)
@@ -32,11 +30,25 @@ class MainActivity : AppCompatActivity(), GetFlickrJsonData.OnDataAvailable {
 //        }
         val getRawData = GetRawData()
         ioScope.launch {
-            val result = getRawData.download(FLICKR_API)
+            val uri = createUri(FLICKR_API, "android,oreo", "en", true)
+            val result = getRawData.download(uri)
             onDownloadComplete(result.first, result.second)
         }
 
         Log.d(TAG, "onCreate ends")
+    }
+
+    private fun createUri(baseURL: String, searchCriteria: String, lang: String, mathAll: Boolean): String {
+        Log.d(TAG, "createUri starts")
+
+        return Uri.parse(baseURL)
+                .buildUpon()
+                .appendQueryParameter("tags", searchCriteria)
+                .appendQueryParameter("tagmode", if (mathAll) "ALL" else "ANY")
+                .appendQueryParameter("lang", lang)
+                .appendQueryParameter("format", "json")
+                .appendQueryParameter("nojsoncallback", "1")
+                .toString()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -80,8 +92,7 @@ class MainActivity : AppCompatActivity(), GetFlickrJsonData.OnDataAvailable {
 
     companion object {
         private const val TAG = "MainActivity"
-        private const val FLICKR_API = "https://api.flickr.com/services/feeds/photos_public.gne?tags=android,oreo" +
-                "&format=json&nojsoncallback=1"
+        private const val FLICKR_API = "https://api.flickr.com/services/feeds/photos_public.gne"
     }
 
 }
