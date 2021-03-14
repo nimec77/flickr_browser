@@ -11,4 +11,7 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="textview">TextView</string>
     <string name="placeholder">Placeholder</string>
+    <string name="title_activity_search">SearchActivity</string>
+    <string name="title_activity_photo_details">Photo Details</string>
+    <string name="add_photo">Add photo</string>
 </resources>
