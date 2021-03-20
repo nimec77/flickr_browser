@@ -14,4 +14,5 @@
     <string name="title_activity_search">SearchActivity</string>
     <string name="title_activity_photo_details">Photo Details</string>
     <string name="add_photo">Add photo</string>
+    <string name="photo_image">Photo Image</string>
 </resources>
