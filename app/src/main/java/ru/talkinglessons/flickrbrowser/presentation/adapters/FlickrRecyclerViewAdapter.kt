@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 import ru.talkinglessons.flickrbrowser.R
 import ru.talkinglessons.flickrbrowser.domain.entities.Photo
 
@@ -26,7 +27,13 @@ class FlickrRecyclerViewAdapter(private var photoList: List<Photo>) :
     }
 
     override fun onBindViewHolder(holder: FlickrImageViewHolder, position: Int) {
-        TODO("Not yet implemented")
+        val photoItem = photoList[position]
+        Log.d(TAG, "onBindViewHolder: ${photoItem.title} --> $position")
+        Picasso.get()
+            .load(photoItem.image)
+            .error(R.drawable.placeholder)
+            .placeholder(R.drawable.placeholder)
+            .into(holder.thumbnail)
     }
 
     override fun getItemCount(): Int {
@@ -35,8 +42,8 @@ class FlickrRecyclerViewAdapter(private var photoList: List<Photo>) :
     }
 
     fun loadNewData(newPhotos: List<Photo>) {
-        photoList = newPhotos;
-        notifyDataSetChanged();
+        photoList = newPhotos
+        notifyDataSetChanged()
     }
 
     fun getPhoto(position: Int): Photo? {
