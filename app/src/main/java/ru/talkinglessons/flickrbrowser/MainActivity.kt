@@ -1,5 +1,6 @@
 package ru.talkinglessons.flickrbrowser
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -7,8 +8,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,12 +17,14 @@ import ru.talkinglessons.flickrbrowser.data.providers.DownloadStatus
 import ru.talkinglessons.flickrbrowser.data.providers.GetFlickrJsonData
 import ru.talkinglessons.flickrbrowser.data.providers.GetRawData
 import ru.talkinglessons.flickrbrowser.domain.entities.Photo
+import ru.talkinglessons.flickrbrowser.presentation.activities.BaseActivity
+import ru.talkinglessons.flickrbrowser.presentation.activities.PHOTO_TRANSFER
+import ru.talkinglessons.flickrbrowser.presentation.activities.PhotoDetailsActivity
 import ru.talkinglessons.flickrbrowser.presentation.adapters.FlickrRecyclerViewAdapter
-import kotlinx.android.synthetic.main.content_main.*
 import ru.talkinglessons.flickrbrowser.presentation.listeners.RecyclerItemClickListener
 
 
-class MainActivity : AppCompatActivity(), GetFlickrJsonData.OnDataAvailable,
+class MainActivity : BaseActivity(), GetFlickrJsonData.OnDataAvailable,
     RecyclerItemClickListener.OnRecyclerClickListener {
     private val ioScope = CoroutineScope(Dispatchers.IO)
     private val mainScope = CoroutineScope(Dispatchers.Main)
@@ -31,7 +34,7 @@ class MainActivity : AppCompatActivity(), GetFlickrJsonData.OnDataAvailable,
         Log.d(TAG, "onCreate called")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setSupportActionBar(findViewById(R.id.toolbar))
+        activateToolbar(false)
 
         recycler_view.layoutManager = LinearLayoutManager(this)
         recycler_view.addOnItemTouchListener(RecyclerItemClickListener(this, recycler_view, this))
@@ -113,7 +116,13 @@ class MainActivity : AppCompatActivity(), GetFlickrJsonData.OnDataAvailable,
 
     override fun onItemLongClick(view: View, position: Int) {
         Log.d(TAG, "onItemLongClick: starts")
-        Toast.makeText(this, "Long tap at position $position", Toast.LENGTH_SHORT).show()
+//        Toast.makeText(this, "Long tap at position $position", Toast.LENGTH_SHORT).show()
+        val photo = flickrRecyclerViewAdapter.getPhoto(position)
+        if (photo != null) {
+            val intent = Intent(this, PhotoDetailsActivity::class.java)
+            intent.putExtra(PHOTO_TRANSFER, photo)
+            startActivity(intent)
+        }
     }
 
     companion object {
