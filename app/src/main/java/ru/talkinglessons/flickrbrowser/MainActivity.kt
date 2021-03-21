@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
@@ -16,9 +18,11 @@ import ru.talkinglessons.flickrbrowser.data.providers.GetRawData
 import ru.talkinglessons.flickrbrowser.domain.entities.Photo
 import ru.talkinglessons.flickrbrowser.presentation.adapters.FlickrRecyclerViewAdapter
 import kotlinx.android.synthetic.main.content_main.*
+import ru.talkinglessons.flickrbrowser.presentation.listeners.RecyclerItemClickListener
 
 
-class MainActivity : AppCompatActivity(), GetFlickrJsonData.OnDataAvailable {
+class MainActivity : AppCompatActivity(), GetFlickrJsonData.OnDataAvailable,
+    RecyclerItemClickListener.OnRecyclerClickListener {
     private val ioScope = CoroutineScope(Dispatchers.IO)
     private val mainScope = CoroutineScope(Dispatchers.Main)
     private val flickrRecyclerViewAdapter = FlickrRecyclerViewAdapter(ArrayList())
@@ -30,7 +34,9 @@ class MainActivity : AppCompatActivity(), GetFlickrJsonData.OnDataAvailable {
         setSupportActionBar(findViewById(R.id.toolbar))
 
         recycler_view.layoutManager = LinearLayoutManager(this)
+        recycler_view.addOnItemTouchListener(RecyclerItemClickListener(this, recycler_view, this))
         recycler_view.adapter = flickrRecyclerViewAdapter
+
         val getRawData = GetRawData()
         ioScope.launch {
             val uri = createUri(FLICKR_API, "android,11", "en", true)
@@ -41,17 +47,22 @@ class MainActivity : AppCompatActivity(), GetFlickrJsonData.OnDataAvailable {
         Log.d(TAG, "onCreate ends")
     }
 
-    private fun createUri(baseURL: String, searchCriteria: String, lang: String, mathAll: Boolean): String {
+    private fun createUri(
+        baseURL: String,
+        searchCriteria: String,
+        lang: String,
+        mathAll: Boolean
+    ): String {
         Log.d(TAG, "createUri starts")
 
         return Uri.parse(baseURL)
-                .buildUpon()
-                .appendQueryParameter("tags", searchCriteria)
-                .appendQueryParameter("tagmode", if (mathAll) "ALL" else "ANY")
-                .appendQueryParameter("lang", lang)
-                .appendQueryParameter("format", "json")
-                .appendQueryParameter("nojsoncallback", "1")
-                .toString()
+            .buildUpon()
+            .appendQueryParameter("tags", searchCriteria)
+            .appendQueryParameter("tagmode", if (mathAll) "ALL" else "ANY")
+            .appendQueryParameter("lang", lang)
+            .appendQueryParameter("format", "json")
+            .appendQueryParameter("nojsoncallback", "1")
+            .toString()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -74,7 +85,7 @@ class MainActivity : AppCompatActivity(), GetFlickrJsonData.OnDataAvailable {
 
     private fun onDownloadComplete(status: DownloadStatus, data: String) {
         if (status == DownloadStatus.OK) {
-            Log.d(TAG, "onDownloadComplete called, data is $data")
+            Log.d(TAG, "onDownloadComplete called")
 
             val getFlickrJsonData = GetFlickrJsonData(this)
             getFlickrJsonData.toJson(data)
@@ -93,6 +104,16 @@ class MainActivity : AppCompatActivity(), GetFlickrJsonData.OnDataAvailable {
 
     override fun onError(exception: Exception) {
         Log.e(TAG, "onError called with ${exception.message}")
+    }
+
+    override fun onItemClick(view: View, position: Int) {
+        Log.d(TAG, "onItemClick: starts")
+        Toast.makeText(this, "Normal tap at position $position", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onItemLongClick(view: View, position: Int) {
+        Log.d(TAG, "onItemLongClick: starts")
+        Toast.makeText(this, "Long tap at position $position", Toast.LENGTH_SHORT).show()
     }
 
     companion object {
