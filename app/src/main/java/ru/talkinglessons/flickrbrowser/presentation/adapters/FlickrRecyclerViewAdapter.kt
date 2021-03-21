@@ -13,7 +13,7 @@ import ru.talkinglessons.flickrbrowser.domain.entities.Photo
 
 class FlickrImageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     var thumbnail: ImageView = view.findViewById(R.id.thumbnail)
-    var title: TextView = view.findViewById(R.id.photo_title)
+    var title: TextView = view.findViewById(R.id.title)
 }
 
 class FlickrRecyclerViewAdapter(private var photoList: List<Photo>) :
@@ -34,6 +34,7 @@ class FlickrRecyclerViewAdapter(private var photoList: List<Photo>) :
             .error(R.drawable.placeholder)
             .placeholder(R.drawable.placeholder)
             .into(holder.thumbnail)
+        holder.title.text = photoItem.title
     }
 
     override fun getItemCount(): Int {

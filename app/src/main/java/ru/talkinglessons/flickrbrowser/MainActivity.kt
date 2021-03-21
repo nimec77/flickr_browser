@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -13,10 +14,14 @@ import ru.talkinglessons.flickrbrowser.data.providers.DownloadStatus
 import ru.talkinglessons.flickrbrowser.data.providers.GetFlickrJsonData
 import ru.talkinglessons.flickrbrowser.data.providers.GetRawData
 import ru.talkinglessons.flickrbrowser.domain.entities.Photo
+import ru.talkinglessons.flickrbrowser.presentation.adapters.FlickrRecyclerViewAdapter
+import kotlinx.android.synthetic.main.content_main.*
+
 
 class MainActivity : AppCompatActivity(), GetFlickrJsonData.OnDataAvailable {
     private val ioScope = CoroutineScope(Dispatchers.IO)
     private val mainScope = CoroutineScope(Dispatchers.Main)
+    private val flickrRecyclerViewAdapter = FlickrRecyclerViewAdapter(ArrayList())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate called")
@@ -24,13 +29,11 @@ class MainActivity : AppCompatActivity(), GetFlickrJsonData.OnDataAvailable {
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
 
-//        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                    .setAction("Action", null).show()
-//        }
+        recycler_view.layoutManager = LinearLayoutManager(this)
+        recycler_view.adapter = flickrRecyclerViewAdapter
         val getRawData = GetRawData()
         ioScope.launch {
-            val uri = createUri(FLICKR_API, "android,oreo", "en", true)
+            val uri = createUri(FLICKR_API, "android,11", "en", true)
             val result = getRawData.download(uri)
             onDownloadComplete(result.first, result.second)
         }
@@ -81,8 +84,10 @@ class MainActivity : AppCompatActivity(), GetFlickrJsonData.OnDataAvailable {
     }
 
     override fun onDataAvailable(data: List<Photo>) {
-        Log.d(TAG, "onDataAvailable called, data is $data")
-
+        Log.d(TAG, "onDataAvailable called")
+        mainScope.launch {
+            flickrRecyclerViewAdapter.loadNewData(data)
+        }
         Log.d(TAG, "onDataAvailable ends")
     }
 
