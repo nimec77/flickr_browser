@@ -23,7 +23,7 @@ import ru.talkinglessons.flickrbrowser.presentation.activities.PhotoDetailsActiv
 import ru.talkinglessons.flickrbrowser.presentation.adapters.FlickrRecyclerViewAdapter
 import ru.talkinglessons.flickrbrowser.presentation.listeners.RecyclerItemClickListener
 
-// Material Design
+// Material Design Too
 
 class MainActivity : BaseActivity(), GetFlickrJsonData.OnDataAvailable,
     RecyclerItemClickListener.OnRecyclerClickListener {
