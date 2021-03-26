@@ -15,8 +15,8 @@ class PhotoDetailsActivity : BaseActivity() {
 
         val photo = intent.extras?.getParcelable<Photo>(PHOTO_TRANSFER)!!
 
-        photo_title.text = photo.title
-        photo_tags.text = photo.tags
+        photo_title.text = getString(R.string.photo_title_text, photo.title)
+        photo_tags.text = getString(R.string.photo_tags_text, photo.tags)
         photo_author.text = photo.author
         Picasso.get()
             .load(photo.link)
