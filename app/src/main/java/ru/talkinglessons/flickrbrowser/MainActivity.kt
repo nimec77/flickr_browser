@@ -20,10 +20,9 @@ import ru.talkinglessons.flickrbrowser.domain.entities.Photo
 import ru.talkinglessons.flickrbrowser.presentation.activities.BaseActivity
 import ru.talkinglessons.flickrbrowser.presentation.activities.PHOTO_TRANSFER
 import ru.talkinglessons.flickrbrowser.presentation.activities.PhotoDetailsActivity
+import ru.talkinglessons.flickrbrowser.presentation.activities.SearchActivity
 import ru.talkinglessons.flickrbrowser.presentation.adapters.FlickrRecyclerViewAdapter
 import ru.talkinglessons.flickrbrowser.presentation.listeners.RecyclerItemClickListener
-
-// Material Design Too And Too 2 3 5 34
 
 class MainActivity : BaseActivity(), GetFlickrJsonData.OnDataAvailable,
     RecyclerItemClickListener.OnRecyclerClickListener {
@@ -82,7 +81,10 @@ class MainActivity : BaseActivity(), GetFlickrJsonData.OnDataAvailable,
         // as you specify a parent activity in AndroidManifest.xml.
         Log.d(TAG, "onOptionItemSelected called")
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.action_search -> {
+                startActivity(Intent(this, SearchActivity::class.java))
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
