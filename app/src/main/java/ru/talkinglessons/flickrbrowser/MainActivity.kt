@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.coroutines.CoroutineScope
@@ -17,10 +18,9 @@ import ru.talkinglessons.flickrbrowser.data.providers.DownloadStatus
 import ru.talkinglessons.flickrbrowser.data.providers.GetFlickrJsonData
 import ru.talkinglessons.flickrbrowser.data.providers.GetRawData
 import ru.talkinglessons.flickrbrowser.domain.entities.Photo
-import ru.talkinglessons.flickrbrowser.presentation.activities.BaseActivity
+import ru.talkinglessons.flickrbrowser.presentation.activities.*
+import ru.talkinglessons.flickrbrowser.presentation.activities.FLICKR_QUERY
 import ru.talkinglessons.flickrbrowser.presentation.activities.PHOTO_TRANSFER
-import ru.talkinglessons.flickrbrowser.presentation.activities.PhotoDetailsActivity
-import ru.talkinglessons.flickrbrowser.presentation.activities.SearchActivity
 import ru.talkinglessons.flickrbrowser.presentation.adapters.FlickrRecyclerViewAdapter
 import ru.talkinglessons.flickrbrowser.presentation.listeners.RecyclerItemClickListener
 
@@ -39,13 +39,6 @@ class MainActivity : BaseActivity(), GetFlickrJsonData.OnDataAvailable,
         recycler_view.layoutManager = LinearLayoutManager(this)
         recycler_view.addOnItemTouchListener(RecyclerItemClickListener(this, recycler_view, this))
         recycler_view.adapter = flickrRecyclerViewAdapter
-
-        val getRawData = GetRawData()
-        ioScope.launch {
-            val uri = createUri(FLICKR_API, "android,11", "en", true)
-            val result = getRawData.download(uri)
-            onDownloadComplete(result.first, result.second)
-        }
 
         Log.d(TAG, "onCreate ends")
     }
@@ -115,6 +108,20 @@ class MainActivity : BaseActivity(), GetFlickrJsonData.OnDataAvailable,
     override fun onResume() {
         Log.d(TAG, "onResume starts")
         super.onResume()
+
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        val queryResult = sharedPreferences.getString(FLICKR_QUERY, "")!!
+
+        if (queryResult.isNotEmpty()) {
+            val getRawData = GetRawData()
+            ioScope.launch {
+                val uri = createUri(FLICKR_API, queryResult, "en", true)
+                val result = getRawData.download(uri)
+                onDownloadComplete(result.first, result.second)
+            }
+        }
+
+        Log.d(TAG, "onResume ends")
     }
 
     override fun onItemClick(view: View, position: Int) {

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.widget.SearchView
+import androidx.preference.PreferenceManager
 import ru.talkinglessons.flickrbrowser.R
 
 class SearchActivity : BaseActivity() {
@@ -31,9 +32,14 @@ class SearchActivity : BaseActivity() {
 
         searchView?.isIconified = true
 
-        searchView?.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 Log.d(TAG, "onQueryTextSubmit: called")
+
+                val sharedPreferences =
+                    PreferenceManager.getDefaultSharedPreferences(applicationContext)
+                sharedPreferences.edit().putString(FLICKR_QUERY, query).apply()
+                searchView?.clearFocus()
 
                 finish()
 
@@ -44,6 +50,11 @@ class SearchActivity : BaseActivity() {
                 return false
             }
         })
+
+        searchView?.setOnCloseListener {
+            finish()
+            false
+        }
 
         Log.d(TAG, "onCreateOptionsMenu: returning")
         return true
