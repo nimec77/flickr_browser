@@ -28,10 +28,23 @@ class SearchActivity : BaseActivity() {
         searchView = menu.findItem(R.id.app_bar_search).actionView as SearchView
         val searchableInfo = searchManager.getSearchableInfo(componentName)
         searchView?.setSearchableInfo(searchableInfo)
-        Log.d(TAG, "onCreateOptionsMenu: $componentName")
-        Log.d(TAG, "onCreateOptionsMenu: $searchableInfo")
 
-         searchView?.isIconified = true
+        searchView?.isIconified = true
+
+        searchView?.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                Log.d(TAG, "onQueryTextSubmit: called")
+
+                finish()
+
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+        })
+
         Log.d(TAG, "onCreateOptionsMenu: returning")
         return true
     }

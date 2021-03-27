@@ -112,6 +112,11 @@ class MainActivity : BaseActivity(), GetFlickrJsonData.OnDataAvailable,
         Log.e(TAG, "onError called with ${exception.message}")
     }
 
+    override fun onResume() {
+        Log.d(TAG, "onResume starts")
+        super.onResume()
+    }
+
     override fun onItemClick(view: View, position: Int) {
         Log.d(TAG, "onItemClick: starts")
         Toast.makeText(this, "Normal tap at position $position", Toast.LENGTH_SHORT).show()
